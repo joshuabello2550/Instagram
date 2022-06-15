@@ -4,6 +4,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -22,7 +25,9 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.instagram.R;
+import com.example.instagram.adapters.PostsAdapter;
 import com.example.instagram.models.Post;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -31,17 +36,16 @@ import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MAIN_ACTIVITY";
-    private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 42;
-    private File photoFile;
-    private EditText etDescription;
-    private Button btnCaptureImage;
-    private ImageView ivPostImage;
-    private Button btnSubmit;
+    private FloatingActionButton fabNewPost;
+    private SwipeRefreshLayout swipeContainer;
+    private PostsAdapter adapter;
+    private List<Post> allPosts;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -64,141 +68,93 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        setAdapter();
         initialize();
-//        queryPosts();
-        btnSubmit();
-        btnCaptureImage();
+        fabNewPostClick();
+        SwipeRefresh();
+    }
 
+    private void setAdapter() {
+        RecyclerView rvPosts;
+        rvPosts = findViewById(R.id.rvPosts);
 
+        // initialize the array that will hold posts and create a PostsAdapter
+        allPosts = new ArrayList<>();
+        adapter = new PostsAdapter(MainActivity.this, allPosts);
+
+        // set the adapter on the recycler view
+        rvPosts.setAdapter(adapter);
+        // set the layout manager on the recycler view
+        rvPosts.setLayoutManager(new LinearLayoutManager(this));
+        queryPosts();
     }
 
     private void initialize() {
-        etDescription =  findViewById(R.id.etDescription);
-        btnCaptureImage =  findViewById(R.id.btnCaptureImage);
-        btnSubmit =  findViewById(R.id.btnSubmit);
-        ivPostImage =  findViewById(R.id.ivPostImage);
+        fabNewPost = findViewById(R.id.fabNewPost);
     }
 
-    protected void queryPosts() {
-        // Specify which class to query
-        ParseQuery<Post> query = ParseQuery.getQuery(Post.class);
-        // find all the post with a certain key
-        query.include(Post.KEY_USER);
+    private void fabNewPostClick() {
+        fabNewPost.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(MainActivity.this, PostActivity.class);
+                startActivity(i);
+            }
+        });
+    }
 
+    private void queryPosts() {
+        // specify what type of data we want to query - Post.class
+        ParseQuery<Post> query = ParseQuery.getQuery(Post.class);
+        // include data referred by user key
+        query.include(Post.KEY_USER);
+        // limit query to latest 20 items
+        query.setLimit(20);
+        // order posts by creation date (newest first)
+        query.addDescendingOrder("createdAt");
+        // start an asynchronous call for posts
         query.findInBackground(new FindCallback<Post>() {
             @Override
             public void done(List<Post> posts, ParseException e) {
+                // check for errors
                 if (e != null) {
                     Log.e(TAG, "Issue with getting posts", e);
                     return;
                 }
-                for (Post post: posts) {
-                    Log.i(TAG, "Post " + post.getDescription() + ", username " +  post.getUser().getUsername());
+
+                // for debugging purposes let's print every post description to logcat
+                for (Post post : posts) {
+                    Log.i(TAG, "Post: " + post.getDescription() + ", username: " + post.getUser().getUsername());
                 }
+
+                // save received posts to list and notify adapter of new data
+                adapter.clear();
+                adapter.addAll(posts);
+                swipeContainer.setRefreshing(false);
             }
         });
     }
 
-    private void btnSubmit() {
-        btnSubmit.setOnClickListener((new View.OnClickListener() {
+    private void SwipeRefresh() {
+        // Lookup the swipe container view
+        swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
+        // Setup refresh listener which triggers new data loading
+        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
-            public void onClick(View v) {
-                String description = etDescription.getText().toString();
-                if (description.isEmpty()){
-                    Toast.makeText(MainActivity.this, "", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                if (photoFile == null || ivPostImage.getDrawable() ==  null) {
-                    Toast.makeText(MainActivity.this, "", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                ParseUser currentUser =  ParseUser.getCurrentUser();
-                savePost(description, currentUser, photoFile);
-            }
-        }));
-    }
-
-    private void savePost(String description, ParseUser currentUser, File photoFile) {
-        Post post = new Post();
-        post.setDescription(description);
-        post.setImage(new ParseFile(photoFile));
-        post.setUser(currentUser);
-        post.saveInBackground(new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                if (e != null) {
-                    Log.e(TAG, "Error while saving", e);
-                    Toast.makeText(MainActivity.this, "Error while saving", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                Log.i(TAG, "Post was successful!!");
-                etDescription.setText("");
-                ivPostImage.setImageResource(0);
+            public void onRefresh() {
+                // Your code to refresh the list here.
+                // Make sure you call swipeContainer.setRefreshing(false)
+                // once the network request has completed successfully.
+                queryPosts();
             }
         });
-
+        // Configure the refreshing colors
+        swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
     }
 
-    private void btnCaptureImage(){
-        btnCaptureImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                launchCamera();
-            }
-        });
-    }
 
-    private void launchCamera() {
-        String photoFileName = "photo.jpg";
 
-        // create Intent to take a picture and return control to the calling application
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        // Create a File reference for future access
-        photoFile = getPhotoFileUri(photoFileName);
-
-        // wrap File object into a content provider
-        // required for API >= 24
-        // See https://guides.codepath.com/android/Sharing-Content-with-Intents#sharing-files-with-api-24-or-higher
-        Uri fileProvider = FileProvider.getUriForFile(MainActivity.this, "com.codepath.fileprovider", photoFile);
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, fileProvider);
-
-        // If you call startActivityForResult() using an intent that no app can handle, your app will crash.
-        // So as long as the result is not null, it's safe to use the intent.
-        if (intent.resolveActivity(getPackageManager()) != null) {
-            // Start the image capture intent to take photo
-            startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
-        }
-    }
-
-    // Returns the File for a photo stored on disk given the fileName
-    private File getPhotoFileUri(String fileName) {
-        // Get safe storage directory for photos
-        // Use `getExternalFilesDir` on Context to access package-specific directories.
-        // This way, we don't need to request external read/write runtime permissions.
-        File mediaStorageDir = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), TAG);
-
-        // Create the storage directory if it does not exist
-        if (!mediaStorageDir.exists() && !mediaStorageDir.mkdirs()){
-            Log.d(TAG, "failed to create directory");
-        }
-
-        // Return the file target for the photo based on filename
-        return new File(mediaStorageDir.getPath() + File.separator + fileName);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
-            if (resultCode == RESULT_OK) {
-                // by this point we have the camera photo on disk
-                Bitmap takenImage = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
-                // RESIZE BITMAP, see section below
-                // Load the taken image into a preview
-                ivPostImage.setImageBitmap(takenImage);
-            } else { // Result was a failure
-                Toast.makeText(this, "Picture wasn't taken!", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
 }
