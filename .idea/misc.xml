@@ -10,8 +10,14 @@
         <entry key="app/src/main/res/layout/activity_login.xml" value="0.25" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.335" />
         <entry key="app/src/main/res/layout/activity_post.xml" value="0.4036458333333333" />
-        <entry key="app/src/main/res/layout/item_post.xml" value="0.45" />
+        <entry key="app/src/main/res/layout/fragment_feed.xml" value="0.25092592592592594" />
+        <entry key="app/src/main/res/layout/fragment_post.xml" value="0.19791666666666666" />
+        <entry key="app/src/main/res/layout/fragment_post_details.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/fragment_scrolling.xml" value="0.18385416666666668" />
+        <entry key="app/src/main/res/layout/item_post.xml" value="0.4279835390946502" />
         <entry key="app/src/main/res/layout/post.xml" value="0.45" />
+        <entry key="app/src/main/res/layout/switch_item.xml" value="0.19791666666666666" />
+        <entry key="app/src/main/res/menu/bottom_menu_nav.xml" value="0.40260416666666665" />
         <entry key="app/src/main/res/menu/menu_main.xml" value="0.335" />
         <entry key="app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.225" />
         <entry key="app/src/main/res/xml/fileprovider.xml" value="0.28177083333333336" />

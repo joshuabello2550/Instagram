@@ -1,42 +1,44 @@
 package com.example.instagram.adapters;
 
 import android.content.Context;
-import android.util.Log;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.instagram.R;
+import com.example.instagram.fragments.FeedFragment;
+import com.example.instagram.fragments.PostDetailsFragment;
 import com.example.instagram.models.Post;
-import com.parse.FindCallback;
-import com.parse.ParseException;
 import com.parse.ParseFile;
-import com.parse.ParseQuery;
 
-import java.util.ArrayList;
+import org.parceler.Parcels;
+
 import java.util.List;
 
-public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> {
+public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
 
     private List<Post> mPosts;
     private Context context;
     private static final String TAG = "Post_Adapter";
 
-    public PostsAdapter(Context context, List<Post> posts) {
+    public FeedAdapter(Context context, List<Post> posts) {
         mPosts = posts;
         this.context = context;
     }
 
     @NonNull
     @Override
-    public PostsAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public FeedAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.item_post, parent, false);
         return new ViewHolder(view);
     }
@@ -71,7 +73,20 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             ParseFile image = post.getImage();
             if (image != null) {
                 Glide.with(context).load(image.getUrl()).into(ivImage);
+                imageOnClickListener(post);
             }
+        }
+
+        private void imageOnClickListener(Post post) {
+            ivImage.setOnClickListener(v -> {
+                AppCompatActivity activity =  (AppCompatActivity) itemView.getContext();
+                FragmentTransaction ft =  activity.getSupportFragmentManager().beginTransaction();
+                PostDetailsFragment postDetailsFragment = new PostDetailsFragment();
+                Bundle args = new Bundle();
+                args.putParcelable("post", Parcels.wrap(post));
+                postDetailsFragment.setArguments(args);
+                ft.replace(R.id.container, postDetailsFragment).commit();
+            });
         }
     }
 
