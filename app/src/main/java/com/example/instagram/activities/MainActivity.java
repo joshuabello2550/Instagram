@@ -23,6 +23,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
+import androidx.appcompat.widget.Toolbar;
 
 import com.example.instagram.R;
 import com.example.instagram.adapters.PostsAdapter;
@@ -72,7 +73,18 @@ public class MainActivity extends AppCompatActivity {
         initialize();
         fabNewPostClick();
         SwipeRefresh();
+        setToolbar();
     }
+
+    private void setToolbar() {
+        // Find the toolbar view inside the activity layout
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setLogo(R.drawable.nav_logo_whiteout);
+        // Sets the Toolbar to act as the ActionBar for this Activity window.
+        // Make sure the toolbar exists in the activity and is not null
+        setSupportActionBar(toolbar);
+    }
+
 
     private void setAdapter() {
         RecyclerView rvPosts;
