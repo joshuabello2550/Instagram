@@ -3,18 +3,22 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/home"
-        android:icon="@drawable/instagram_home_outline_24"
-        app:showAsAction="always" />
+        android:enabled="true"
+        android:icon="@drawable/selector_home_button"
+        app:showAsAction="ifRoom" />
     <item
         android:id="@+id/newPost"
-        android:icon="@drawable/instagram_new_post_outline_24"
-        app:showAsAction="always" />
+        android:enabled="true"
+        android:icon="@drawable/selector_new_post"
+        app:showAsAction="ifRoom" />
     <item
         android:id="@+id/favorites"
-        android:icon="@drawable/ufi_heart"
-        app:showAsAction="always" />
+        android:enabled="true"
+        android:icon="@drawable/selector_heart"
+        app:showAsAction="ifRoom" />
     <item
         android:id="@+id/profile"
-        android:icon="@drawable/instagram_user_outline_24"
-        app:showAsAction="always" />
+        android:enabled="true"
+        android:icon="@drawable/selector_profile"
+        app:showAsAction="ifRoom" />
 </menu>

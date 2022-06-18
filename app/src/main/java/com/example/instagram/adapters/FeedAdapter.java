@@ -1,10 +1,13 @@
 package com.example.instagram.adapters;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.ColorFilter;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -23,6 +26,7 @@ import com.parse.ParseFile;
 
 import org.parceler.Parcels;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
@@ -59,22 +63,28 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
         private TextView tvUsername;
         private TextView tvDescription;
         private ImageView ivImage;
+        private ImageButton ibLike;
+        private TextView tvLikeCount;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             tvDescription =  itemView.findViewById(R.id.tvDescription);
             ivImage = itemView.findViewById(R.id.ivImage);
             tvUsername = itemView.findViewById(R.id.tvUsername);
+            ibLike =  itemView.findViewById(R.id.ibLike);
+            tvLikeCount =  itemView.findViewById(R.id.tvLikeCount);
         }
 
         public void bind(Post post) {
             tvDescription.setText(post.getDescription());
             tvUsername.setText(post.getUser().getUsername());
+            tvLikeCount.setText(post.likeCountsDisplayText());
             ParseFile image = post.getImage();
             if (image != null) {
                 Glide.with(context).load(image.getUrl()).into(ivImage);
                 imageOnClickListener(post);
             }
+            likeButtonOnClickListener(post);
         }
 
         private void imageOnClickListener(Post post) {
@@ -88,6 +98,30 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
                 ft.replace(R.id.container, postDetailsFragment).commit();
             });
         }
+
+        private void likeButtonOnClickListener(Post post) {
+            List listLikedBy =  post.getLikedBy();
+            if (listLikedBy.contains(post.getUser().getObjectId())) {
+                ibLike.setColorFilter(R.color.white);
+            } else {
+                listLikedBy.add(post.getUser().getObjectId());
+                ibLike.setColorFilter(R.color.black);
+            }
+
+            ibLike.setOnClickListener(v -> {
+                if (listLikedBy.contains(post.getUser().getObjectId())) {
+                    listLikedBy.remove(post.getUser().getObjectId());
+                    ibLike.setColorFilter(R.color.white);
+                } else {
+                    listLikedBy.add(post.getUser().getObjectId());
+                    ibLike.setColorFilter(R.color.black);
+                }
+                post.setLikedBy(listLikedBy);
+                post.saveInBackground();
+                tvLikeCount.setText(post.likeCountsDisplayText());
+            });
+        }
+
     }
 
     // Clean all elements of the recycler

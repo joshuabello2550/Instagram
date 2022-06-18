@@ -31,22 +31,21 @@
         app:layout_constraintTop_toBottomOf="@+id/cardView"
         tools:srcCompat="@tools:sample/avatars" />
 
+
     <TextView
         android:id="@+id/tvDescription"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
-        android:layout_marginTop="16dp"
         android:layout_marginEnd="12dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="8dp"
         android:text="TextView"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ivComments"
+        app:layout_constraintTop_toBottomOf="@+id/ibLike"
         app:layout_constraintVertical_bias="1.0" />
-
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView"
@@ -68,26 +67,6 @@
     </androidx.cardview.widget.CardView>
 
     <ImageView
-        android:id="@+id/ivLikes"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ivImage"
-        app:srcCompat="@drawable/ufi_heart" />
-
-    <ImageView
-        android:id="@+id/ivComments"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintStart_toEndOf="@+id/ivLikes"
-        app:layout_constraintTop_toBottomOf="@+id/ivImage"
-        app:srcCompat="@drawable/ufi_comment" />
-
-    <ImageView
         android:id="@+id/ivSave"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -107,14 +86,44 @@
         app:layout_constraintTop_toTopOf="@+id/tvUsername"
         app:srcCompat="@drawable/media_option_button" />
 
-    <ImageView
-        android:id="@+id/ivShare"
+    <TextView
+        android:id="@+id/tvLikeCount"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:text="TextView"
+        app:layout_constraintBottom_toBottomOf="@+id/ibLike"
+        app:layout_constraintStart_toEndOf="@+id/ibLike"
+        app:layout_constraintTop_toTopOf="@+id/ibLike"
+        android:gravity="center"/>
+
+    <ImageButton
+        android:id="@+id/ibLike"
+        android:layout_width="46dp"
+        android:layout_height="42dp"
+        android:layout_marginStart="16dp"
+        android:background="#971414"
+        android:backgroundTint="#00FFFFFF"
+        android:tint="#000000"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ivImage"
+        app:srcCompat="@drawable/selector_heart" />
+
+    <ImageButton
+        android:id="@+id/imageButton2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintStart_toEndOf="@+id/ivComments"
-        app:layout_constraintTop_toBottomOf="@+id/ivImage"
+        android:backgroundTint="#00FFFFFF"
+        app:layout_constraintStart_toEndOf="@+id/tvLikeCount"
+        app:layout_constraintTop_toTopOf="@+id/ibLike"
+        app:srcCompat="@drawable/ufi_comment" />
+
+    <ImageButton
+        android:id="@+id/imageButton3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="#00FFFFFF"
+        app:layout_constraintStart_toEndOf="@+id/imageButton2"
+        app:layout_constraintTop_toTopOf="@+id/imageButton2"
         app:srcCompat="@drawable/direct" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
